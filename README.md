@@ -47,7 +47,6 @@ flowchart TB
 
 ```mermaid
 flowchart LR
-flowchart LR
     NewData["New data .xyz"]
 
     DataService["Data Service"]
