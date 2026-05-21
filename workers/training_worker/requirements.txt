@@ -1,0 +1,16 @@
+# Celery worker + S3 client
+celery[redis]>=5.4.0
+pydantic-settings>=2.6.0
+boto3>=1.35.0
+
+# Numerics + PySCF (used by models/shared/basis.py to derive AO basis strings)
+numpy>=2.1.0
+scipy>=1.11.0
+pyscf>=2.6.0
+
+# MACE training stack
+torch>=2.5.0
+torch-geometric>=2.5.0
+e3nn>=0.4.4,<0.5.0
+mace-torch>=0.3.0
+graph2mat[e3nn,tools]>=0.0.13

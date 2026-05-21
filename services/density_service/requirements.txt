@@ -1,0 +1,18 @@
+# FastAPI service + S3/Redis client
+fastapi>=0.115.0
+uvicorn[standard]>=0.32.0
+python-multipart>=0.0.12
+pydantic-settings>=2.6.0
+boto3>=1.35.0
+
+# Numerics + DFT (used by /predict/dft and /predict/mace/with-scf)
+numpy>=2.1.0
+scipy>=1.11.0
+pyscf>=2.6.0
+
+# MACE inference stack (real graph2mat forward in /predict/mace)
+torch>=2.5.0
+torch-geometric>=2.5.0
+e3nn>=0.4.4,<0.5.0
+mace-torch>=0.3.0
+graph2mat[e3nn,tools]>=0.0.13
