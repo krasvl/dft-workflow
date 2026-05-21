@@ -8,18 +8,20 @@ DFT Workflow: сервисный стек для обработки молеку
 
 ```mermaid
 flowchart TB
-    User["Клиент / ноутбук"]
+    User["Client / Notebook"]
 
     Nginx["API Gateway<br/>Nginx"]
 
-    DataService["Data Service<br/>загрузка, manifest-ы, jobs"]
-    DensityService["Density Service<br/>инференс матрицы плотности"]
+    DataService["Data Service ×N<br/>upload / export / dataset manifests"]
+    DensityService["Density Service ×M<br/>density prediction<br/>online inference"]
 
-    MinIO[("MinIO<br/>.xyz, .npz, model.pt, json")]
-    Redis[("Redis<br/>очереди: dft, training")]
+    MinIO[("MinIO<br/>.xyz inputs<br/>.npz DFT artifacts<br/>model files<br/>metadata")]
 
-    DftWorkers["DFT worker (Celery)<br/>очередь: dft"]
-    TrainingWorkers["Training worker (Celery)<br/>очередь: training"]
+    Redis[("Redis<br/>Celery broker<br/>queues: dft, training")]
+
+    DftWorkers["Celery Workers: DFT ×K<br/>queue: dft<br/>DFT calculations"]
+
+    TrainingWorkers["Celery Workers: Trainer ×L<br/>queue: training<br/>model training"]
 
     User --> Nginx
 
@@ -28,40 +30,45 @@ flowchart TB
 
     DensityService --> MinIO
 
+    DataService --> MinIO
     DataService --> Redis
 
     Redis --> DftWorkers
     Redis --> TrainingWorkers
 
     DftWorkers --> MinIO
+    DftWorkers --> Redis
+
     TrainingWorkers --> MinIO
+    TrainingWorkers --> Redis
 ```
 
 ## Поток данных
 
 ```mermaid
 flowchart LR
-    NewData["новые .xyz"]
+flowchart LR
+    NewData["New data .xyz"]
 
     DataService["Data Service"]
 
-    MinIORaw[("MinIO<br/>molecules/raw")]
+    MinIORaw[("MinIO<br/>raw molecules (.xyz)")]
 
-    RedisDft[("Redis<br/>очередь: dft")]
+    RedisDft[("Redis<br/>queue: dft")]
 
-    DftRunner["DFT worker"]
+    DftRunner["Celery Workers: DFT<br/>DFT calculation"]
 
-    MinIODft[("MinIO<br/>dft/artifacts (.npz)")]
+    MinIODft[("MinIO<br/>DFT artifacts (.npz)")]
 
-    RedisTrain[("Redis<br/>очередь: training")]
+    RedisTrain[("Redis<br/>queue: training")]
 
-    Trainer["Training worker"]
+    Trainer["Celery Workers: Trainer<br/>training / fine-tuning"]
 
-    MinIOModels[("MinIO<br/>models/")]
+    MinIOModels[("MinIO<br/>model files<br/>model.pt / config / metrics")]
 
-    DensityService["Density Service"]
+    DensityService["Density Service<br/>online ML inference"]
 
-    Client["Клиент"]
+    Client["Client / Notebook"]
 
     NewData --> DataService
 
